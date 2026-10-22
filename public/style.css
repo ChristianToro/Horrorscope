@@ -8,9 +8,27 @@
   --card: rgba(26, 18, 64, 0.55);
   --border: rgba(155, 140, 255, 0.3);
   --error: #ff9a9a;
+
+  /* The crypt */
+  --pitch: #07060a;
+  --bone: #d9cdb4;
+  --blood: #8a0f14;
+  --ember: #ff9a3c;
+  --tarnish: #b08d4a;
 }
 
 * { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 body {
   margin: 0;
@@ -128,18 +146,292 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-.result {
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
-
-.result p {
-  margin: 0;
-  line-height: 1.6;
-}
-
 .error {
   margin: 20px 0 0;
   color: var(--error);
+}
+
+/* ---------- The jump scare ---------- */
+
+.scare {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+}
+
+.ghoul {
+  width: min(80vw, 70vh);
+  transform: scale(0.15);
+  opacity: 0;
+}
+
+/* 0.4s per red flash keeps it under 3 flashes a second (WCAG 2.3.1). */
+.scare.active { animation: flash 0.4s steps(1, end) 3; }
+.scare.active .ghoul {
+  animation:
+    lunge 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.4) forwards,
+    shake 0.08s linear 0.3s infinite;
+}
+
+@keyframes flash {
+  0% { background: var(--blood); }
+  50% { background: #000; }
+}
+
+@keyframes lunge {
+  from { transform: scale(0.15); opacity: 0; }
+  to { transform: scale(1.5); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: scale(1.5) translate(0, 0) rotate(0); opacity: 1; }
+  25% { transform: scale(1.5) translate(-8px, 6px) rotate(-2deg); opacity: 1; }
+  50% { transform: scale(1.55) translate(7px, -5px) rotate(2deg); opacity: 1; }
+  75% { transform: scale(1.5) translate(-5px, -7px) rotate(-1deg); opacity: 1; }
+}
+
+/* ---------- The crypt ---------- */
+
+.crypt {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  color: var(--bone);
+  font-family: "IM Fell English", Georgia, serif;
+  cursor: none;
+}
+
+.crypt * { cursor: none; }
+
+.crypt-bg,
+.darkness,
+.void,
+.flame {
+  position: fixed;
+  pointer-events: none;
+}
+
+.crypt-bg,
+.darkness,
+.void { inset: 0; }
+
+.crypt-bg {
+  z-index: 0;
+  background: var(--pitch) url("assets/sananthropis-haunted-house-7508035_1920.jpg") center / cover no-repeat;
+  filter: grayscale(0.35) brightness(0.55) contrast(1.15);
+}
+
+.darkness {
+  --x: 50vw;
+  --y: 50vh;
+  --r: 220px;
+  z-index: 1;
+  background: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    rgba(255, 150, 60, 0.12) 0%,
+    rgba(20, 8, 0, 0.3) 40%,
+    rgba(0, 0, 0, 0.94) 100%
+  );
+}
+
+.void {
+  z-index: 2;
+  background: #000;
+  opacity: 0;
+  transition: opacity 2.5s ease-in;
+}
+
+.crypt-bg,
+.darkness,
+.flame {
+  opacity: 0;
+  transition: opacity 3s ease-out;
+}
+
+.crypt.black .void { opacity: 1; }
+.crypt.revealed .void { opacity: 0; transition: opacity 3s ease-out; }
+.crypt.revealed .crypt-bg,
+.crypt.revealed .darkness,
+.crypt.revealed .flame { opacity: 1; }
+
+.flame {
+  z-index: 4;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 22px;
+  margin: -24px 0 0 -6px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 70%, #fff 0%, #ffe08a 25%, var(--ember) 55%, rgba(255, 80, 0, 0) 75%);
+  box-shadow: 0 0 18px 6px rgba(255, 140, 50, 0.45);
+  animation: flame-dance 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes flame-dance {
+  from { scale: 1 1; }
+  to { scale: 0.88 1.12; }
+}
+
+@media (hover: none) {
+  .flame { display: none; }
+}
+
+.crypt-content {
+  position: relative;
+  z-index: 3;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px;
+}
+
+.death-message {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+  text-shadow: 0 0 18px rgba(138, 15, 20, 0.9), 0 0 4px #000;
+  text-align: center;
+  transform: translateY(38vh);
+  transition: transform 1.8s ease-in-out;
+}
+
+.crypt.settled .death-message { transform: none; }
+
+.ghost-letter {
+  display: inline-block;
+  white-space: pre;
+  opacity: 0;
+  animation: materialize 1.2s ease-out forwards;
+}
+
+@keyframes materialize {
+  from { opacity: 0; filter: blur(8px); transform: translateY(-6px); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+
+/* ---------- The omen ---------- */
+
+.omen-modal {
+  width: 100%;
+  max-width: 760px;
+  margin: 28px auto 40px;
+  padding: 28px 24px;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  background: linear-gradient(180deg, rgba(20, 12, 10, 0.88), rgba(8, 5, 5, 0.93));
+  border: 1px solid rgba(138, 15, 20, 0.7);
+  box-shadow: 0 0 40px rgba(138, 15, 20, 0.35), inset 0 0 60px rgba(0, 0, 0, 0.8);
+  animation: rise-in 1.8s ease-out 0.4s both;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+.omen-modal h2 {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  letter-spacing: 0.12em;
+  color: var(--blood);
+  text-shadow: 0 0 10px rgba(138, 15, 20, 0.6);
+}
+
+.omen-modal h2:focus { outline: none; }
+
+.omen-sections {
+  display: grid;
+  gap: 22px;
+}
+
+.omen-section {
+  padding-top: 18px;
+  border-top: 1px solid rgba(138, 15, 20, 0.5);
+}
+
+.omen-section::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.omen-section h3 {
+  margin: 0 0 10px;
+  font-family: "Cinzel", Georgia, serif;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tarnish);
+}
+
+.omen-section p { margin: 0 0 10px; }
+
+.death-photo {
+  float: right;
+  width: 110px;
+  margin: 0 0 10px 16px;
+  border: 1px solid rgba(176, 141, 74, 0.5);
+  filter: sepia(0.8) grayscale(0.3) contrast(1.1);
+}
+
+.death-name {
+  font-family: "Cinzel", Georgia, serif;
+  font-size: 1.15rem;
+}
+
+.death-year { color: var(--blood); }
+
+.death-desc { font-style: italic; opacity: 0.8; }
+
+.death-link {
+  color: var(--ember);
+  text-decoration-color: rgba(255, 154, 60, 0.4);
+}
+
+.crypt-error {
+  margin: 0 0 10px;
+  text-align: center;
+  font-style: italic;
+}
+
+.rise {
+  display: block;
+  margin: 24px auto 0;
+  padding: 10px 22px;
+  font-family: "Cinzel", Georgia, serif;
+  letter-spacing: 0.15em;
+  color: var(--bone);
+  background: transparent;
+  border: 1px solid var(--blood);
+  border-radius: 2px;
+}
+
+.rise:hover { background: var(--blood); filter: none; }
+.rise:focus-visible { outline-color: var(--ember); }
+
+@media (max-width: 480px) {
+  .omen-modal { padding: 22px 16px; }
+  .death-photo { float: none; display: block; margin: 0 auto 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scare.active,
+  .scare.active .ghoul { animation: none; }
+  .ghoul { transform: scale(1); opacity: 1; }
+  .flame { animation: none; }
+  .death-message { transition: none; }
+  .ghost-letter { animation: fade 1.2s ease-out forwards; }
+}
+
+@keyframes fade {
+  to { opacity: 1; }
 }

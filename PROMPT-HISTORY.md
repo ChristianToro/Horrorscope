@@ -242,3 +242,72 @@ The user chose **server log only** over showing the counts on the page.
 - `node --check` passes on both files.
 - With the server running, `1994-02-30` still returns 400 and writes no `[reading]` line.
 - The success path wasn't run, because it spends API credit. The user's next live reading will confirm the log line.
+
+---
+
+## Session: 2026-10-22
+
+**Objective:** Turn the astrology reader into a gothic-horror prank, with the landing page kept as a decoy.
+
+### Interaction 7 — Planning the horror redesign
+
+**User Prompt**
+
+> We are going to change the nature of the application and horrify the experience for users.
+>
+> The landing page will remain the way it is, and act as a decoy. Users will select their birthday. Once submitted, a frightening jump scare should occur, then the page will fade to black, and slowly display the message "...you have died..." with the picture in `/assets/sananthropis-haunted-house-7508035_1920.jpg` will serve as the background for the page.
+>
+> Gothic horror will be the theme: dark colors. The page should have a dark tint, and the user's cursor will act as a candle/light source to illuminate the page based on cursor location.
+>
+> The resulting modal will have three sections: horoscope, historical death and details, and a dark omen. Leverage the wikimedia's API On This Day to retrieve a historical death and its details. The horoscope should take on a darker tone. The dark omen should incorporate the user's horoscope and the historical death.
+
+**Agent Outcome**
+
+Ran in plan mode. The agent probed both Wikimedia endpoints, chose `en.wikipedia.org/api/rest_v1/feed/onthisday/deaths/MM/DD`, and confirmed its response shape. Each entry has `text`, `year` and `pages[0]` with a description, extract, thumbnail and URL. The feed has no cause of death. The agent also noticed that the image sat in untracked `public/assets/`, and that `server.js` would serve `.jpg` as `application/octet-stream`.
+
+**Collaboration**
+
+CLAUDE.md marks the system prompt as the user's verbatim wording, so the agent asked before replacing it. The user's decisions:
+- **System prompt:** use the agent's gothic draft, but with the Chinese zodiac removed (Western only).
+- **Historical death:** random each time, instead of the death closest to the birth year.
+- **Jump scare:** a drawn SVG ghoul plus a shriek synthesized with Web Audio, so no asset files.
+- **Death media:** show the Wikipedia portrait and a link (needs a CSP `img-src` change).
+
+### Interaction 8 — Plan saved and implemented
+
+**User Prompt**
+
+> write this plan as PLAN-HORROR.md at the repo root, then execute in manual mode
+
+**Agent Outcome**
+
+The user rejected the plan-approval request and gave this instruction instead, as in Interaction 2. The agent copied the plan to `PLAN-HORROR.md` and built it with each step approved by the user.
+
+**Rationale**
+
+- **One Claude call:** structured output (`output_config.format` with a `json_schema` of `{horoscope, omen}`) returns both texts in one request, at the same model and the same `effort: "low"`. Refusal is still checked before parsing, and a parse failure becomes the existing `UserFacingError`.
+- **Wikipedia on the server:** browsers can't set a `User-Agent`, the CSP stays tight, and the death has to reach Claude anyway. A failed lookup returns `null`, so the reading still works.
+- **The haunting covers latency:** the fetch starts on submit, and the ~12-second sequence usually finishes after the reading has arrived.
+- **CSP constraints:** `style-src 'self'` blocks `style=""` attributes, so the SVG uses presentation attributes and JS sets styles only through `element.style`.
+- **Safety:** red flashes are capped under 3 per second (WCAG 2.3.1), `prefers-reduced-motion` removes the shake, flashing and flicker, and the shriek's peak gain is moderate.
+
+**Changes**
+
+- [`PLAN-HORROR.md`](PLAN-HORROR.md): the approved plan, plus a note on the thumbnail-host deviation.
+- [`lib/wikimedia.js`](lib/wikimedia.js): new. `getHistoricalDeath(isoDate)` fetches, caches per day, picks at random and allowlists URLs by host.
+- [`lib/astrologer.js`](lib/astrologer.js): the new system prompt, `getReading(isoDate, death)` returning `{horoscope, omen, usage}`, and the JSON schema.
+- [`server.js`](server.js): calls the death lookup, returns `{horoscope, death, omen}`, adds the death to the log line, adds `.jpg`/`.svg` to the MIME types, and adds CSP `img-src 'self' https://thumb.wikimedia.org https://upload.wikimedia.org`.
+- [`public/index.html`](public/index.html), [`public/style.css`](public/style.css), [`public/app.js`](public/app.js): the decoy is unchanged. Added: the ghoul SVG, the crypt layers, the candle, the three-section modal, "Rise again", and the scare/shriek/descend/candle code.
+- [`CLAUDE.md`](CLAUDE.md), [`README.md`](README.md): the new flow, the prompt decision, the CSP and the checklist.
+
+**Verification**
+
+- `node --check` passes on all JS files.
+- The Wikipedia module returned different random deaths for 1994-03-05 and `null` for an impossible date.
+- The server returned `image/jpeg` for the background, sent the new CSP, and still returned 400 for `1994-02-30`, `2999-01-01` and `nope`.
+- Three live readings (Haiku, about 550–610 input and 220–230 output tokens each) returned Pisces-only horoscopes. Each omen wove in the dead figure (Ranuccio I Farnese, Richard Kiley, Geoff Edwards).
+- Headless Chrome was driven over the DevTools protocol at 1280×800 and 390×844. That caught two bugs, both fixed:
+  - spaces in "...you have died..." collapsed inside the inline-block letter spans (fixed with `white-space: pre`)
+  - portraits never showed, because 88 of 93 thumbnails come from `thumb.wikimedia.org`, which wasn't allowlisted
+- After the fixes, the portrait loaded with no CSP violations, and phone width had no horizontal scroll. The only 404 was the existing missing `favicon.ico`.
+- Not verified: the shriek actually playing (headless has no audio and the test submit had no real user gesture), reduced-motion mode, the stopped-server error path, and "Rise again".

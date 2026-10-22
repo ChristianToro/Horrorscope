@@ -8,14 +8,15 @@ import { extname, join, normalize } from 'node:path';
 
 try { process.loadEnvFile(); } catch { /* no .env: rely on real env vars */ }
 const { getReading, UserFacingError } = await import('./lib/astrologer.js');
+const { getHistoricalDeath } = await import('./lib/wikimedia.js');
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 const PUBLIC = new URL('./public/', import.meta.url).pathname;
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript' };
+const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
 
 const SECURITY_HEADERS = {
-  'Content-Security-Policy': "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-ancestors 'none'",
+  'Content-Security-Policy': "default-src 'self'; img-src 'self' https://thumb.wikimedia.org https://upload.wikimedia.org; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-ancestors 'none'",
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'no-referrer',
 };
@@ -35,9 +36,10 @@ createServer(async (req, res) => {
       const birthday = body?.birthday;
       if (!isValidBirthday(birthday)) return send(res, 400, { error: 'Enter a real date between 1900 and today.' });
 
-      const { reading, usage } = await getReading(birthday);
-      console.log(`[reading] ${birthday} — ${usage.input} in / ${usage.output} out tokens`);
-      return send(res, 200, { reading });
+      const death = await getHistoricalDeath(birthday);
+      const { horoscope, omen, usage } = await getReading(birthday, death);
+      console.log(`[reading] ${birthday} — ${death?.name ?? 'no death'} — ${usage.input} in / ${usage.output} out tokens`);
+      return send(res, 200, { horoscope, death, omen });
     }
 
     const path = normalize(join(PUBLIC, req.url === '/' ? 'index.html' : req.url.split('?')[0]));

@@ -6,11 +6,12 @@
   <title>Celestial Birthday Reader</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="card">
+  <!-- The decoy -->
+  <main id="landing" class="card">
     <p class="glyphs" aria-hidden="true">☾ ✦ ☉ ✦ ☽</p>
     <h1>Celestial Birthday Reader</h1>
     <p class="subtitle">Enter your birthday to reveal your Western and Chinese zodiac.</p>
@@ -21,12 +22,77 @@
       <button type="submit" id="submit">Read the stars</button>
     </form>
 
-    <section id="result" class="result" aria-live="polite" hidden>
-      <h2>Your reading</h2>
-      <p id="reading"></p>
-    </section>
     <p id="error" class="error" role="alert" hidden></p>
   </main>
+
+  <!-- The jump scare -->
+  <div id="scare" class="scare" hidden>
+    <svg class="ghoul" viewBox="0 0 200 260" aria-hidden="true">
+      <defs>
+        <radialGradient id="skin" cx="50%" cy="40%" r="65%">
+          <stop offset="0%" stop-color="#e8e2cf"/>
+          <stop offset="60%" stop-color="#8f8a78"/>
+          <stop offset="100%" stop-color="#1a1714"/>
+        </radialGradient>
+        <radialGradient id="socket" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#000"/>
+          <stop offset="70%" stop-color="#0a0505"/>
+          <stop offset="100%" stop-color="#3a2a22"/>
+        </radialGradient>
+      </defs>
+      <path d="M100 8 C150 8 182 48 180 108 C178 150 166 178 150 204 C138 226 122 252 100 252 C78 252 62 226 50 204 C34 178 22 150 20 108 C18 48 50 8 100 8 Z" fill="url(#skin)"/>
+      <path d="M100 10 L96 40 L104 58 L98 76 M150 30 L140 52 L146 66" stroke="#2a221c" stroke-width="2" fill="none"/>
+      <ellipse cx="66" cy="104" rx="26" ry="32" fill="url(#socket)" transform="rotate(-12 66 104)"/>
+      <ellipse cx="134" cy="104" rx="26" ry="32" fill="url(#socket)" transform="rotate(12 134 104)"/>
+      <circle cx="68" cy="110" r="4" fill="#ff1a1a"/>
+      <circle cx="132" cy="110" r="4" fill="#ff1a1a"/>
+      <path d="M100 132 L90 158 L110 158 Z" fill="#120c0a"/>
+      <path d="M62 176 C72 168 128 168 138 176 C142 206 124 244 100 246 C76 244 58 206 62 176 Z" fill="#050202"/>
+      <path d="M68 178 L74 196 L80 176 L86 198 L93 174 L100 200 L107 174 L114 198 L120 176 L126 196 L132 178 Z" fill="#d8d0b0"/>
+      <path d="M74 236 L80 220 L86 238 L93 218 L100 240 L107 218 L114 238 L120 220 L126 236 Z" fill="#b8ae8e"/>
+    </svg>
+  </div>
+
+  <!-- The afterlife -->
+  <div id="crypt" class="crypt" hidden>
+    <div class="crypt-bg"></div>
+    <div id="darkness" class="darkness"></div>
+    <div class="void"></div>
+    <div id="flame" class="flame" aria-hidden="true"></div>
+
+    <div class="crypt-content">
+      <p id="death-message" class="death-message"></p>
+
+      <section id="omen-modal" class="omen-modal" role="dialog" aria-labelledby="omen-title" hidden>
+        <h2 id="omen-title" tabindex="-1">Your Fate Is Sealed</h2>
+
+        <div id="omen-sections" class="omen-sections">
+          <article class="omen-section">
+            <h3>Horoscope</h3>
+            <p id="horoscope"></p>
+          </article>
+
+          <article class="omen-section">
+            <h3>Historical Death</h3>
+            <img id="death-photo" class="death-photo" alt="" hidden>
+            <p class="death-name"><span id="death-name"></span> <span id="death-year" class="death-year"></span></p>
+            <p id="death-desc" class="death-desc"></p>
+            <p id="death-extract"></p>
+            <a id="death-link" class="death-link" target="_blank" rel="noopener" hidden>Read their story</a>
+          </article>
+
+          <article class="omen-section">
+            <h3>Dark Omen</h3>
+            <p id="omen"></p>
+          </article>
+        </div>
+
+        <p id="crypt-error" class="crypt-error" role="alert" hidden></p>
+        <button id="rise" type="button" class="rise">Rise again</button>
+      </section>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
