@@ -1,0 +1,8 @@
+# secrets — .env.example is the tracked template
+.env
+.env.*
+!.env.example
+
+node_modules/
+.DS_Store
+*:Zone.Identifier

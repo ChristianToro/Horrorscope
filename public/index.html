@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Celestial Birthday Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <p class="glyphs" aria-hidden="true">☾ ✦ ☉ ✦ ☽</p>
+    <h1>Celestial Birthday Reader</h1>
+    <p class="subtitle">Enter your birthday to reveal your Western and Chinese zodiac.</p>
+
+    <form id="birthday-form" novalidate>
+      <label for="birthday">Date of birth</label>
+      <input id="birthday" name="birthday" type="date" min="1900-01-01" required>
+      <button type="submit" id="submit">Read the stars</button>
+    </form>
+
+    <section id="result" class="result" aria-live="polite" hidden>
+      <h2>Your reading</h2>
+      <p id="reading"></p>
+    </section>
+    <p id="error" class="error" role="alert" hidden></p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
