@@ -2,7 +2,7 @@
 
 A gothic-horror prank disguised as a friendly astrology site. The landing page looks like a celestial birthday reader. When you submit your birthday:
 
-1. A ghoul lunges at the screen with a synthesized shriek and red flashes.
+1. A creepy face lunges at the screen with a synthesized shriek and red flashes.
 2. The page fades to black and **"...you have died..."** appears one letter at a time.
 3. A haunted house fades in. The page is dark, and your cursor is a candle that lights it.
 4. A modal shows three sections:
@@ -18,7 +18,7 @@ The front end is plain HTML, CSS and JavaScript. A small Node server calls Claud
 - ✅ It was checked in headless Chrome at 1280×800 and 390×844: scare → black → message → crypt → modal. The candle follows the cursor, the portrait loads with no CSP violations, and there's no horizontal scroll on phones.
 - ✅ The live structured-output reading works: Pisces only (no Chinese sign), and the omen mentions the historical figure.
 - ✅ Date validation, error handling and the path-traversal guard are unchanged and still pass.
-- ⬜ The shriek has only been checked in code. Headless Chrome can't play audio, so listen for it in a real browser.
+- ✅ The shriek plays in a real browser (confirmed by the user).
 
 ## Requirements
 
@@ -100,7 +100,7 @@ curl -s -X POST localhost:3000/api/reading \
 │   ├── astrologer.js  # Claude call: model, system prompt, JSON schema, error mapping
 │   └── wikimedia.js   # Wikipedia "On This Day" deaths: fetch, cache, random pick
 ├── public/
-│   ├── index.html     # decoy form, ghoul SVG, crypt + omen modal
+│   ├── index.html     # decoy form, scare image, crypt + omen modal
 │   ├── style.css      # celestial decoy theme + gothic crypt theme
 │   ├── app.js         # submit → scare → fade → message → crypt → modal; shriek; candle
 │   └── assets/        # haunted-house background
@@ -112,17 +112,17 @@ curl -s -X POST localhost:3000/api/reading \
 ## Design
 
 - **Decoy:** unchanged. A navy-to-indigo gradient, gold and violet accents, a twinkling CSS starfield, Cinzel headings and a frosted-glass card.
-- **Jump scare:** an inline SVG ghoul that lunges (scale 0.15→1.5) and shakes over red flashes. Flashes are kept under 3 per second (WCAG 2.3.1). The shriek is detuned sawtooth oscillators sweeping 700→1600 Hz with vibrato plus band-passed noise, all generated with Web Audio, so there are no audio files.
+- **Jump scare:** `assets/scary-anime-white-creepy-face-77575efixwlhmwp1.webp` lunges (scale 0.15→1.5) and shakes over red flashes. Flashes are kept under 3 per second (WCAG 2.3.1). The shriek is detuned sawtooth oscillators sweeping 700→1600 Hz with vibrato plus band-passed noise, all generated with Web Audio, so there are no audio files.
 - **Crypt:** a near-black palette with bone text `#d9cdb4`, blood red `#8a0f14`, ember `#ff9a3c` and tarnished gold. The background is the desaturated haunted house. A `radial-gradient` darkness layer follows the cursor, with a flickering radius and a small CSS flame. On touch devices the light starts in the center and follows taps.
 - **Type:** Cinzel for headings and IM Fell English for the crypt text (Google Fonts).
-- **Reduced motion:** no shake, flashing or flicker. The ghoul simply appears, and the message still fades in.
+- **Reduced motion:** no shake, flashing or flicker. The face simply appears, and the message still fades in.
 
 ## Manual test checklist
 
 - [ ] `npm run check-key` prints ✅
 - [x] 1994-03-05 gives a Pisces horoscope with no Chinese sign
 - [x] After a reading, the server console shows `[reading] <date> — <name> — N in / N out tokens`
-- [ ] The jump scare's shriek plays (real browser, sound on)
+- [x] The jump scare's shriek plays (real browser, sound on)
 - [x] Scare → black → "...you have died..." → crypt → modal plays in order
 - [x] The candle follows the cursor
 - [x] The historical death shows a portrait and link with no CSP errors in the console

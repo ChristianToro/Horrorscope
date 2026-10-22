@@ -311,3 +311,35 @@ The user rejected the plan-approval request and gave this instruction instead, a
   - portraits never showed, because 88 of 93 thumbnails come from `thumb.wikimedia.org`, which wasn't allowlisted
 - After the fixes, the portrait loaded with no CSP violations, and phone width had no horizontal scroll. The only 404 was the existing missing `favicon.ico`.
 - Not verified: the shriek actually playing (headless has no audio and the test submit had no real user gesture), reduced-motion mode, the stopped-server error path, and "Rise again".
+
+### Interaction 9 — Commit, swap the scare image, steady the candle cursor
+
+**User Prompt**
+
+> the skriek played. I want to use a different asset instead of the ghoul: use the `scary-anime...` asset instead, change nothing else.
+>
+> The candle-cursor bounces too much: it should be still and more indicative to help a user figure out where they can click. It currently is unclear of where the cursor is.
+>
+> commit the previous changes, and then commit each adjustment separately
+
+**Agent Outcome**
+
+The user confirmed that the shriek plays in a real browser.
+
+1. **Commit of the previous work:** `96d2d99` contains the Interaction 8 redesign and the haunted-house image. The new `.webp` was left out so it could ship with its own change.
+2. **Scare image:** the inline SVG ghoul is replaced by `<img class="ghoul" src="assets/scary-anime-white-creepy-face-77575efixwlhmwp1.webp" alt="">`. The `ghoul` class is kept, so the existing size, lunge, shake, flash and reduced-motion CSS all apply unchanged.
+
+**Rationale**
+
+The only change outside the markup is `'.webp': 'image/webp'` in `server.js#TYPES`. Without it the image is served as `application/octet-stream` while `nosniff` is on. The image is a portrait close-up on near-black, so at the existing `min(80vw, 70vh)` width and 1.5× scale the face fills a 1280×800 screen without retuning.
+
+**Changes**
+
+- [`public/index.html`](public/index.html): the SVG is replaced by the image.
+- [`server.js`](server.js): `.webp` MIME type added.
+- `public/assets/scary-anime-white-creepy-face-77575efixwlhmwp1.webp`: added (supplied by the user).
+- [`CLAUDE.md`](CLAUDE.md), [`README.md`](README.md): SVG mentions replaced, and the shriek is checked off.
+
+**Verification**
+
+Staged in headless Chrome by un-hiding `#scare` from JS, with no form submit and no API call. The image was served `200 image/webp` and loaded at 506px wide. The full-scale screenshot shows the face filling the screen over the black backdrop.

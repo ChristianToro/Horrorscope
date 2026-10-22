@@ -13,7 +13,7 @@ const { getHistoricalDeath } = await import('./lib/wikimedia.js');
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 const PUBLIC = new URL('./public/', import.meta.url).pathname;
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
 
 const SECURITY_HEADERS = {
   'Content-Security-Policy': "default-src 'self'; img-src 'self' https://thumb.wikimedia.org https://upload.wikimedia.org; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-ancestors 'none'",
