@@ -103,7 +103,7 @@ curl -s -X POST localhost:3000/api/reading \
 │   ├── index.html     # decoy form, scare image, crypt + omen modal
 │   ├── style.css      # celestial decoy theme + gothic crypt theme
 │   ├── app.js         # submit → scare → fade → message → crypt → modal; shriek; candle
-│   └── assets/        # haunted-house background
+│   └── assets/        # haunted-house background, scare face, candle cursors
 ├── .env.example       # template for .env
 ├── PLAN.md            # original implementation plan
 └── PLAN-HORROR.md     # horror redesign plan
@@ -113,9 +113,9 @@ curl -s -X POST localhost:3000/api/reading \
 
 - **Decoy:** unchanged. A navy-to-indigo gradient, gold and violet accents, a twinkling CSS starfield, Cinzel headings and a frosted-glass card.
 - **Jump scare:** `assets/scary-anime-white-creepy-face-77575efixwlhmwp1.webp` lunges (scale 0.15→1.5) and shakes over red flashes. Flashes are kept under 3 per second (WCAG 2.3.1). The shriek is detuned sawtooth oscillators sweeping 700→1600 Hz with vibrato plus band-passed noise, all generated with Web Audio, so there are no audio files.
-- **Crypt:** a near-black palette with bone text `#d9cdb4`, blood red `#8a0f14`, ember `#ff9a3c` and tarnished gold. The background is the desaturated haunted house. A `radial-gradient` darkness layer follows the cursor, with a flickering radius and a small CSS flame. On touch devices the light starts in the center and follows taps.
+- **Crypt:** a near-black palette with bone text `#d9cdb4`, blood red `#8a0f14`, ember `#ff9a3c` and tarnished gold. The background is the desaturated haunted house. A steady `radial-gradient` darkness layer opens around the cursor. The pointer is a native candle cursor (`assets/candle-cursor.svg`, clicking at the flame tip), and it switches to a haloed candle (`candle-cursor-lit.svg`) over links and buttons. On touch devices the light starts in the center and follows taps.
 - **Type:** Cinzel for headings and IM Fell English for the crypt text (Google Fonts).
-- **Reduced motion:** no shake, flashing or flicker. The face simply appears, and the message still fades in.
+- **Reduced motion:** no shake or flashing. The face simply appears, and the message still fades in.
 
 ## Manual test checklist
 
@@ -124,7 +124,8 @@ curl -s -X POST localhost:3000/api/reading \
 - [x] After a reading, the server console shows `[reading] <date> — <name> — N in / N out tokens`
 - [x] The jump scare's shriek plays (real browser, sound on)
 - [x] Scare → black → "...you have died..." → crypt → modal plays in order
-- [x] The candle follows the cursor
+- [x] The candle light follows the cursor and holds still
+- [ ] The candle cursor shows, and turns haloed over "Rise again" and the Wikipedia link (real browser; headless screenshots don't draw the cursor)
 - [x] The historical death shows a portrait and link with no CSP errors in the console
 - [x] Submitting the same date twice gives different deaths
 - [ ] A future date or an empty field shows an error on the decoy, with no scare

@@ -5,12 +5,10 @@ const landing = document.getElementById('landing');
 const scare = document.getElementById('scare');
 const crypt = document.getElementById('crypt');
 const darkness = document.getElementById('darkness');
-const flame = document.getElementById('flame');
 const message = document.getElementById('death-message');
 const modal = document.getElementById('omen-modal');
 
 const DEATH_MESSAGE = '...you have died...';
-const stillMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Local date, not UTC, so "today" matches the user's calendar.
@@ -178,23 +176,14 @@ function fillDeath(death) {
   }
 }
 
-// The cursor is a candle: the darkness opens around it and flickers.
+// The cursor is a candle (see the crypt cursor in style.css): the darkness opens around it.
 function lightCandle() {
-  let x = innerWidth / 2;
-  let y = innerHeight / 2;
-  let flicker = 0;
-  const follow = (e) => { x = e.clientX; y = e.clientY; };
+  const follow = (e) => {
+    darkness.style.setProperty('--x', `${e.clientX}px`);
+    darkness.style.setProperty('--y', `${e.clientY}px`);
+  };
   addEventListener('pointermove', follow);
   addEventListener('pointerdown', follow);
-
-  (function frame() {
-    if (!stillMotion) flicker = flicker * 0.85 + (Math.random() - 0.5) * 6;
-    darkness.style.setProperty('--x', `${x}px`);
-    darkness.style.setProperty('--y', `${y}px`);
-    darkness.style.setProperty('--r', `${220 + flicker * 4}px`);
-    flame.style.transform = `translate(${x}px, ${y}px)`;
-    requestAnimationFrame(frame);
-  })();
 }
 
 function showError(msg) {

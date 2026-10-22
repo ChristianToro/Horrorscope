@@ -203,15 +203,15 @@ button:focus-visible {
   overflow-y: auto;
   color: var(--bone);
   font-family: "IM Fell English", Georgia, serif;
-  cursor: none;
+  cursor: url("assets/candle-cursor.svg") 16 1, auto;
 }
 
-.crypt * { cursor: none; }
+.crypt a,
+.crypt button { cursor: url("assets/candle-cursor-lit.svg") 16 1, pointer; }
 
 .crypt-bg,
 .darkness,
-.void,
-.flame {
+.void {
   position: fixed;
   pointer-events: none;
 }
@@ -247,8 +247,7 @@ button:focus-visible {
 }
 
 .crypt-bg,
-.darkness,
-.flame {
+.darkness {
   opacity: 0;
   transition: opacity 3s ease-out;
 }
@@ -256,30 +255,7 @@ button:focus-visible {
 .crypt.black .void { opacity: 1; }
 .crypt.revealed .void { opacity: 0; transition: opacity 3s ease-out; }
 .crypt.revealed .crypt-bg,
-.crypt.revealed .darkness,
-.crypt.revealed .flame { opacity: 1; }
-
-.flame {
-  z-index: 4;
-  left: 0;
-  top: 0;
-  width: 12px;
-  height: 22px;
-  margin: -24px 0 0 -6px;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  background: radial-gradient(ellipse at 50% 70%, #fff 0%, #ffe08a 25%, var(--ember) 55%, rgba(255, 80, 0, 0) 75%);
-  box-shadow: 0 0 18px 6px rgba(255, 140, 50, 0.45);
-  animation: flame-dance 0.35s ease-in-out infinite alternate;
-}
-
-@keyframes flame-dance {
-  from { scale: 1 1; }
-  to { scale: 0.88 1.12; }
-}
-
-@media (hover: none) {
-  .flame { display: none; }
-}
+.crypt.revealed .darkness { opacity: 1; }
 
 .crypt-content {
   position: relative;
@@ -427,7 +403,6 @@ button:focus-visible {
   .scare.active,
   .scare.active .ghoul { animation: none; }
   .ghoul { transform: scale(1); opacity: 1; }
-  .flame { animation: none; }
   .death-message { transition: none; }
   .ghost-letter { animation: fade 1.2s ease-out forwards; }
 }

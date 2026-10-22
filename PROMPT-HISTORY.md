@@ -343,3 +343,35 @@ The only change outside the markup is `'.webp': 'image/webp'` in `server.js#TYPE
 **Verification**
 
 Staged in headless Chrome by un-hiding `#scare` from JS, with no form submit and no API call. The image was served `200 image/webp` and loaded at 506px wide. The full-scale screenshot shows the face filling the screen over the black backdrop.
+
+**Agent Outcome (continued): steady, readable candle cursor**
+
+3. **Candle cursor:** three things caused the "bounce":
+   - a random per-frame jitter on the light radius
+   - a `scale` animation on the drawn flame
+   - the real pointer being hidden (`cursor: none`) while a JS-positioned flame sat about 24px above the actual click point, a frame behind
+
+   All three are removed: the `#flame` element, its CSS and keyframes, the `requestAnimationFrame` loop and the `stillMotion` check. `lightCandle()` now just writes `--x/--y` on `pointermove`/`pointerdown`, and `--r` stays at 220px. The pointer is a real CSS cursor: `assets/candle-cursor.svg` everywhere in the crypt, and `assets/candle-cursor-lit.svg` (brighter flame plus a halo ring) over `a` and `button`, both with the hotspot at the flame tip (`16 1`) and falling back to `auto`/`pointer`.
+
+**Rationale**
+
+The OS draws native cursors, so they track the pointer without lag and can't bounce. A distinct hover cursor answers "where can I click" directly. The SVG cursors are same-origin files rather than `data:` URIs, so the existing `img-src 'self'` CSP covers them, and `.svg` was already in `TYPES`.
+
+**Changes**
+
+- [`public/assets/candle-cursor.svg`](public/assets/candle-cursor.svg), [`public/assets/candle-cursor-lit.svg`](public/assets/candle-cursor-lit.svg): new 32×32 cursors with a dark outline so they show on both light and dark areas.
+- [`public/index.html`](public/index.html): `#flame` removed.
+- [`public/app.js`](public/app.js): `lightCandle()` simplified; the `flame` and `stillMotion` constants removed.
+- [`public/style.css`](public/style.css): crypt `cursor: url(...)` rules added; the `.flame` styles, `flame-dance` keyframes and `cursor: none` removed.
+- [`CLAUDE.md`](CLAUDE.md), [`README.md`](README.md): candle behavior updated, with a note not to go back to a drawn flame.
+
+**Verification**
+
+- Staged the crypt in headless Chrome with stub data (no API call). Six `--r` samples over 0.7s were all `220px`. Screenshots show the light hole centered on the moved pointer.
+- The computed `cursor` is `url(candle-cursor.svg) 16 1, auto` on text and `url(candle-cursor-lit.svg) 16 1, pointer` on the Rise again button. Both SVGs are served `200 image/svg+xml` and decode at 32×32.
+- Rendered both icons at 6× on black and on bone: both are legible.
+- Not verified: how the OS-drawn cursor looks in a real browser, since headless screenshots don't include the cursor.
+
+**Collaboration**
+
+The user confirmed that the shriek plays and supplied the replacement scare image, with the instruction to "change nothing else". They also asked for the commits to be split: the previous work first, then one commit per adjustment.
